@@ -58,7 +58,7 @@ def update(image_path,correct_values):
                 break
 
         if inside_segmentation and confidence >= 0.40:
-            color = (0, 255, 0)
+            color = (255, 255, 0)
             x1, y1, x2, y2 = map(int, detection_bbox)
             cv2.rectangle(image, (x1, y1), (x2, y2), color, 2)
             cv2.putText(image, f"{detection_result.names[label]} {confidence:.2f}", (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, color, 2)
@@ -76,7 +76,7 @@ def update(image_path,correct_values):
     # print(red_boxes)
     # print(correct_values)
     for i in range(0,len(red_boxes)):
-        color = (0, 255, 0)
+        color = (255, 255, 0)
         x1, y1, x2, y2 = map(int, red_boxes.get(i))
         cv2.rectangle(image, (x1, y1), (x2, y2), color, 2)
         cv2.putText(image, f"{correct_values[str(i)]}", (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, color, 2)
@@ -84,7 +84,7 @@ def update(image_path,correct_values):
         index=index+1
         
     cv2.imwrite('static/images/marked_image.jpg', image)
-    ordering(all_boxes)
+    ordering(all_boxes,'static/images/uploaded_image.jpg')
     # print(all_boxes)
     
     
@@ -118,7 +118,7 @@ def analyse(image_path):
                 break
 
         if inside_segmentation and confidence >= 0.40:
-            color = (0, 255, 0)
+            color = (255, 255, 0)
             x1, y1, x2, y2 = map(int, detection_bbox)
             cv2.rectangle(image, (x1, y1), (x2, y2), color, 2)
             cv2.putText(image, f"{detection_result.names[label]} {confidence:.2f}", (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, color, 2)
@@ -134,10 +134,28 @@ def analyse(image_path):
     # print(red_boxes)
     return red_boxes
 
-def ordering(all_detections):
+def ordering(all_detections,image_path):
+    TopHalf={}
+    BottomHalf={}
     Xsorted = sorted(all_detections.items(), key=lambda item: item[1][1][0])
     Xsorted_dict = dict(Xsorted)
-    print(Xsorted_dict)
+    image = cv2.imread(image_path)
+    height, width, channels = image.shape
+    
+    for k,v in Xsorted_dict.items():
+        centerx,centery= get_bbox_center(v[1])
+        if(centery<height/2):
+            TopHalf[k] = v
+        else:
+            BottomHalf[k]=v
+    
+
+    
+        
+    print(TopHalf)
+    print()
+    print(BottomHalf)
+    correct_order = [1,3,5]
 
     
     
