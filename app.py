@@ -19,7 +19,9 @@ def get_bbox_center(bbox):
 
 def update(image_path,correct_values):
     no_red_box=0
+    index =0
     red_boxes = {}
+    all_boxes={}
     image = cv2.imread(image_path)
     segmentation_results = segmentation_model(image)
     segmentation_bboxes = segmentation_results[0].boxes.xyxy.cpu().numpy()
@@ -60,23 +62,31 @@ def update(image_path,correct_values):
             x1, y1, x2, y2 = map(int, detection_bbox)
             cv2.rectangle(image, (x1, y1), (x2, y2), color, 2)
             cv2.putText(image, f"{detection_result.names[label]} {confidence:.2f}", (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, color, 2)
+            all_boxes[index] = [detection_result.names[label], detection_bbox]
+            index=index+1
         else:
             color = (0, 0, 255)
             red_boxes[no_red_box]=segmentation_bbox
             no_red_box= no_red_box+1
+            
             # sx1, sy1, sx2, sy2 = map(int, segmentation_bbox)
             # cv2.rectangle(image, (sx1, sy1), (sx2, sy2), color, 2)
             # cv2.putText(image, f"Box {len(red_boxes)-1}", (sx1, sy1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, color, 2)
 
-    print(red_boxes)
-    print(correct_values)
+    # print(red_boxes)
+    # print(correct_values)
     for i in range(0,len(red_boxes)):
         color = (0, 255, 0)
         x1, y1, x2, y2 = map(int, red_boxes.get(i))
         cv2.rectangle(image, (x1, y1), (x2, y2), color, 2)
         cv2.putText(image, f"{correct_values[str(i)]}", (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, color, 2)
-    
+        all_boxes[index] = [correct_values[str(i)], red_boxes.get(i)]
+        index=index+1
+        
     cv2.imwrite('static/images/marked_image.jpg', image)
+    ordering(all_boxes)
+    # print(all_boxes)
+    
     
     
 
@@ -123,6 +133,16 @@ def analyse(image_path):
     cv2.imwrite('static/images/marked_image.jpg', image)
     # print(red_boxes)
     return red_boxes
+
+def ordering(all_detections):
+    Xsorted = sorted(all_detections.items(), key=lambda item: item[1][1][0])
+    Xsorted_dict = dict(Xsorted)
+    print(Xsorted_dict)
+
+    
+    
+
+
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
