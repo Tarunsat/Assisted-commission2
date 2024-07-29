@@ -9,7 +9,7 @@
     <form method="post">
         {% for idx, box in enumerate(red_boxes) %}
             <label for="box{{ idx }}">Box {{ idx }}: </label>
-            <input type="text" name="box{{ idx }}" id="box{{ idx }}">
+            <input type="text" name="{{ idx }}" id="{{ idx }}">
             <br>
         {% endfor %}
         <input type="submit" value="Submit">
