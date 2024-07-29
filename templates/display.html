@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Processed Image</title>
+</head>
+<body>
+    <h1>Processed Image</h1>
+    <img src="{{ url_for('static', filename='images/marked_image.jpg') }}" alt="Marked Image">
+    <h2>Correct Values</h2>
+    <ul>
+        {% for key, value in values.items() %}
+            <li>Box {{ key }}: {{ value }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

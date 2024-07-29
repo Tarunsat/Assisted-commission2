@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Correct Values</title>
+</head>
+<body>
+    <h1>Enter Correct Values for Red Boxes</h1>
+    <img src="{{ url_for('static', filename='images/marked_image.jpg') }}" alt="Marked Image">
+    <form method="post">
+        {% for idx, box in enumerate(red_boxes) %}
+            <label for="box{{ idx }}">Box {{ idx }}: </label>
+            <input type="text" name="box{{ idx }}" id="box{{ idx }}">
+            <br>
+        {% endfor %}
+        <input type="submit" value="Submit">
+    </form>
+</body>
+</html>
