@@ -4,6 +4,7 @@ import numpy as np
 from ultralytics import YOLO
 
 app = Flask(__name__)
+threshold =0.1
 
 # Load the YOLOv8 segmentation model
 segmentation_model = YOLO('best.pt')
@@ -57,8 +58,8 @@ def update(image_path,correct_values):
                 inside_segmentation = True
                 break
 
-        if inside_segmentation and confidence >= 0.40:
-            color = (255, 255, 0)
+        if inside_segmentation and confidence >= threshold:
+            color = (255, 0, 0)
             x1, y1, x2, y2 = map(int, detection_bbox)
             cv2.rectangle(image, (x1, y1), (x2, y2), color, 2)
             cv2.putText(image, f"{detection_result.names[label]} {confidence:.2f}", (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, color, 2)
@@ -117,8 +118,8 @@ def analyse(image_path):
                 inside_segmentation = True
                 break
 
-        if inside_segmentation and confidence >= 0.40:
-            color = (255, 255, 0)
+        if inside_segmentation and confidence >= threshold:
+            color = (255, 0, 0)
             x1, y1, x2, y2 = map(int, detection_bbox)
             cv2.rectangle(image, (x1, y1), (x2, y2), color, 2)
             cv2.putText(image, f"{detection_result.names[label]} {confidence:.2f}", (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, color, 2)
@@ -155,10 +156,55 @@ def ordering(all_detections,image_path):
     print(TopHalf)
     print()
     print(BottomHalf)
-    correct_order = [1,3,5]
+    
+    checking(TopHalf,BottomHalf,image_path)
+    
 
-    
-    
+def checking(TopHalf,BottomHalf,image_path):
+    CorrectTopHalf=['1','3','5']
+    image = cv2.imread(image_path)
+    CorrectBottomHalf=['2','4','6']
+    i=0
+    for k,v in TopHalf.items():
+        try:
+            if(v[0]==CorrectTopHalf[i]):
+                color = (0, 255, 0)
+                x1, y1, x2, y2 = map(int, v[1])
+                cv2.rectangle(image, (x1, y1), (x2, y2), color, 2)
+                cv2.putText(image, f"{CorrectTopHalf[i]}", (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, color, 2)
+            else:
+                color = (0, 0, 255)
+                x1, y1, x2, y2 = map(int, v[1])
+                cv2.rectangle(image, (x1, y1), (x2, y2), color, 2)
+                cv2.putText(image, f"Supposed to be:{CorrectTopHalf[i]}", (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, color, 2)
+            i=i+1
+        except:
+            color = (0, 0, 255)
+            x1, y1, x2, y2 = map(int, v[1])
+            cv2.rectangle(image, (x1, y1), (x2, y2), color, 2)
+            # cv2.putText(image, f"Supposed to be:{CorrectTopHalf[i]}", (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, color, 2)
+    i=0
+    for k,v in BottomHalf.items():
+        try:
+            if(v[0]==CorrectBottomHalf[i]):
+                color = (0, 255, 0)
+                x1, y1, x2, y2 = map(int, v[1])
+                cv2.rectangle(image, (x1, y1), (x2, y2), color, 2)
+                cv2.putText(image, f"{CorrectBottomHalf[i]}", (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, color, 2)
+            else:
+                color = (0, 0, 255)
+                x1, y1, x2, y2 = map(int, v[1])
+                cv2.rectangle(image, (x1, y1), (x2, y2), color, 2)
+                cv2.putText(image, f"Supposed to be:{CorrectBottomHalf[i]}", (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, color, 2)
+            i=i+1
+        except:
+            color = (0, 0, 255)
+            x1, y1, x2, y2 = map(int, v[1])
+            cv2.rectangle(image, (x1, y1), (x2, y2), color, 2)
+            # cv2.putText(image, f"Supposed to be:{CorrectBottomHalf[i]}", (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, color, 2)
+
+    cv2.imwrite('static/images/marked_image.jpg', image)
+    return render_template('Verified.html')
 
 
 
