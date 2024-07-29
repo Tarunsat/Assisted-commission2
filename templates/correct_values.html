@@ -1,16 +1,75 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Correct Values</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .image-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+        }
+        form {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        label {
+            display: inline-block;
+            width: 80px;
+            margin-bottom: 10px;
+        }
+        input[type="text"] {
+            width: calc(100% - 90px);
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            display: block;
+            width: 100%;
+            margin-top: 20px;
+        }
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+    </style>
 </head>
 <body>
     <h1>Enter Correct Values for Red Boxes</h1>
-    <img src="{{ url_for('static', filename='images/marked_image.jpg') }}" alt="Marked Image">
+    <div class="image-container">
+        <img src="{{ url_for('static', filename='images/marked_image.jpg') }}" alt="Marked Image">
+    </div>
     <form method="post">
         {% for idx, box in enumerate(red_boxes) %}
-            <label for="box{{ idx }}">Box {{ idx }}: </label>
-            <input type="text" name="{{ idx }}" id="{{ idx }}">
-            <br>
+        <label for="box{{ idx }}">Box {{ idx }}: </label>
+        <input type="text" name="{{ idx }}" id="box{{ idx }}" required>
         {% endfor %}
         <input type="submit" value="Submit">
     </form>

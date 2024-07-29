@@ -1,16 +1,71 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Processed Image</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        h1, h2 {
+            color: #333;
+            text-align: center;
+        }
+        .image-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .values-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            background-color: #e9f7ef;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .box-number {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+    </style>
 </head>
 <body>
     <h1>Processed Image</h1>
-    <img src="{{ url_for('static', filename='images/marked_image.jpg') }}" alt="Marked Image">
-    <h2>Correct Values</h2>
-    <ul>
-        {% for key, value in values.items() %}
-            <li>Box {{ key }}: {{ value }}</li>
-        {% endfor %}
-    </ul>
+    <div class="image-container">
+        <img src="{{ url_for('static', filename='images/marked_image.jpg') }}" alt="Marked Image">
+    </div>
+    <div class="values-container">
+        <h2>Correct Values</h2>
+        <ul>
+            {% for key, value in values.items() %}
+                <li>
+                    <span class="box-number">Box {{ key }}:</span>
+                    <span>{{ value }}</span>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
 </body>
 </html>
