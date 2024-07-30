@@ -6,10 +6,11 @@ from ultralytics import YOLO
 app = Flask(__name__)
 threshold =0.1
 
+detection_big = YOLO('best_bigobj.pt')
 # Load the YOLOv8 segmentation model
 segmentation_model = YOLO('best.pt')
 # Load the YOLOv8 object detection model
-detection_model = YOLO('best_obj2.pt')
+detection_model = YOLO('best_obj6.pt')
 
 # Function to get the center of a bounding box
 def get_bbox_center(bbox):
@@ -85,12 +86,32 @@ def update(image_path,correct_values):
         index=index+1
         
     cv2.imwrite('static/images/marked_image.jpg', image)
-    ordering(all_boxes,'static/images/uploaded_image.jpg')
+    ordering(all_boxes,'static/images/cropped.jpg')
     # print(all_boxes)
     
     
     
+def crop(image_path):
+    image = cv2.imread(image_path)
+    detection_results = detection_big(image)
+        
+                     
+    for detection_result in detection_results:
+        detection_bboxes = detection_results[0].boxes.xyxy.cpu().numpy()
+        # detection_bboxes = detection_results[0].boxes.xyxy  # Extract bounding boxes
+        x1, y1, x2, y2 = map(int, detection_bboxes[0])  # Convert bounding box to integers
 
+        # Ensure coordinates are within image bounds
+        x1 = max(0, x1)
+        y1 = 0
+        x2 = min(image.shape[1], x2)
+        y2 = image.shape[0]
+
+        cropped_image = image[y1:y2, x1:x2]  # Crop the image to the bounding box
+    cv2.imwrite('static/images/cropped.jpg', cropped_image)
+        
+    
+    
 def analyse(image_path):
     no_red_box=0
     red_boxes = {}
@@ -111,9 +132,10 @@ def analyse(image_path):
         
     for segmentation_bbox in segmentation_bboxes:
         sx1, sy1, sx2, sy2 = segmentation_bbox
+        inside_segmentation = False
         for detection_bbox, confidence, label in zip(detection_bboxes, detection_confidences, detection_labels):
             center_x, center_y = get_bbox_center(detection_bbox)
-            inside_segmentation = False
+            
             if sx1 <= center_x <= sx2 and sy1 <= center_y <= sy2:
                 inside_segmentation = True
                 break
@@ -222,11 +244,11 @@ def process_image():
     if request.method == 'POST':
         correct_values = request.form.to_dict()
         # print(correct_values)
-
-        update('static/images/uploaded_image.jpg',correct_values)
-        return render_template('display.html', values=correct_values)
         
-    return render_template('correct_values.html', red_boxes=analyse('static/images/uploaded_image.jpg'), enumerate=enumerate)
+        update('static/images/cropped.jpg',correct_values)
+        return render_template('display.html', values=correct_values)
+    crop('static/images/uploaded_image.jpg')
+    return render_template('correct_values.html', red_boxes=analyse('static/images/cropped.jpg'), enumerate=enumerate)
 
 if __name__ == '__main__':
     app.run(debug=True)
